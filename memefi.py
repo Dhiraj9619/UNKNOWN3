@@ -11,11 +11,163 @@ import os  # For clearing the terminal
 from urllib.parse import unquote
 from colorama import Fore, Style
 
-# Import the modules directly since they are now in the main directory
-from headers import headers_set
-from queries import QUERY_USER, MUTATION_GAME_PROCESS_TAPS_BATCH, QUERY_BOOSTER, QUERY_NEXT_BOSS, QUERY_GAME_CONFIG
+# Define headers_set directly
+headers_set = {
+    'accept': '*/*',
+    'accept-language': 'en-US,en;q=0.9',
+    'cache-control': 'no-cache',
+    'content-type': 'application/json',
+    'origin': 'https://tg-app.memefi.club',
+    'pragma': 'no-cache',
+    'priority': 'u=1, i',
+    'referer': 'https://tg-app.memefi.club/',
+    'sec-fetch-dest': 'empty',
+    'sec-fetch-mode': 'cors',
+    'sec-fetch-site': 'same-site',
+    'user-agent': 'Mozilla/5.0 (Linux; Android 13; M2012K11AG Build/TKQ1.220829.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/125.0.6422.165 Mobile'
+}
 
-url = "api-gw-tg.memefi.club"
+# GraphQL Queries
+QUERY_USER = """
+query QueryTelegramUserMe {
+  telegramUserMe {
+    firstName
+    lastName
+    telegramId
+    username
+    referralCode
+    isDailyRewardClaimed
+    referral {
+      username
+      lastName
+      firstName
+      bossLevel
+      coinsAmount
+      __typename
+    }
+    isReferralInitialJoinBonusAvailable
+    league
+    leagueIsOverTop10k
+    leaguePosition
+    _id
+    __typename
+  }
+}
+"""
+
+QUERY_GAME_CONFIG = """
+query QUERY_GAME_CONFIG {
+  telegramGameGetConfig {
+    ...FragmentBossFightConfig
+    __typename
+  }
+}
+
+fragment FragmentBossFightConfig on TelegramGameConfigOutput {
+  _id
+  coinsAmount
+  currentEnergy
+  maxEnergy
+  weaponLevel
+  energyLimitLevel
+  energyRechargeLevel
+  tapBotLevel
+  currentBoss {
+    _id
+    level
+    currentHealth
+    maxHealth
+    __typename
+  }
+  freeBoosts {
+    _id
+    currentTurboAmount
+    maxTurboAmount
+    turboLastActivatedAt
+    turboAmountLastRechargeDate
+    currentRefillEnergyAmount
+    maxRefillEnergyAmount
+    refillEnergyLastActivatedAt
+    refillEnergyAmountLastRechargeDate
+    __typename
+  }
+  bonusLeaderDamageEndAt
+  bonusLeaderDamageStartAt
+  bonusLeaderDamageMultiplier
+  nonce
+  __typename
+}
+"""
+
+MUTATION_GAME_PROCESS_TAPS_BATCH = """
+mutation MutationGameProcessTapsBatch($payload: TelegramGameTapsBatchInput!) {
+  telegramGameProcessTapsBatch(payload: $payload) {
+    ...FragmentBossFightConfig
+    __typename
+  }
+}
+
+fragment FragmentBossFightConfig on TelegramGameConfigOutput {
+  _id
+  coinsAmount
+  currentEnergy
+  maxEnergy
+  weaponLevel
+  energyLimitLevel
+  energyRechargeLevel
+  tapBotLevel
+  currentBoss {
+    _id
+    level
+    currentHealth
+    maxHealth
+    __typename
+  }
+  freeBoosts {
+    _id
+    currentTurboAmount
+    maxTurboAmount
+    turboLastActivatedAt
+    turboAmountLastRechargeDate
+    currentRefillEnergyAmount
+    maxRefillEnergyAmount
+    refillEnergyLastActivatedAt
+    refillEnergyAmountLastRechargeDate
+    __typename
+  }
+  bonusLeaderDamageEndAt
+  bonusLeaderDamageStartAt
+  bonusLeaderDamageMultiplier
+  nonce
+  __typename
+}
+"""
+
+QUERY_BOOSTER = """
+mutation telegramGameActivateBooster($boosterType: BoosterType!) {
+  telegramGameActivateBooster(boosterType: $boosterType) {
+    ...FragmentBossFightConfig
+    __typename
+  }
+}
+"""
+
+QUERY_NEXT_BOSS = """
+mutation telegramGameSetNextBoss {
+  telegramGameSetNextBoss {
+    ...FragmentBossFightConfig
+    __typename
+  }
+}
+"""
+
+# Other Queries (if needed)
+QUERY_LOGIN = """mutation MutationTelegramUserLogin($webAppData: TelegramWebAppDataInput!) {
+    telegramUserLogin(webAppData: $webAppData) {
+        access_token
+        __typename
+    }
+}"""
 
 # Function to fetch IP and country
 def get_ip_and_country():
