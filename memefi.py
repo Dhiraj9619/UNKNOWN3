@@ -9,9 +9,11 @@ import ssl
 import socket
 import os  # For clearing the terminal
 from urllib.parse import unquote
-from utils.headers import headers_set
-from utils.queries import QUERY_USER, MUTATION_GAME_PROCESS_TAPS_BATCH, QUERY_BOOSTER, QUERY_NEXT_BOSS, QUERY_GAME_CONFIG
 from colorama import Fore, Style
+
+# Import the modules directly since they are now in the main directory
+from headers import headers_set
+from queries import QUERY_USER, MUTATION_GAME_PROCESS_TAPS_BATCH, QUERY_BOOSTER, QUERY_NEXT_BOSS, QUERY_GAME_CONFIG
 
 url = "api-gw-tg.memefi.club"
 
@@ -45,7 +47,7 @@ def art():
     
     # Get IP and country
     ip, country = get_ip_and_country()
-    print(Fore.CYAN + "MemeFi Script Edited by TG @Dhiraj_9619 💫 " + Style.RESET_ALL)
+    print(Fore.CYAN + "MemeFi Script Edited by TG @Dhiraj_9619 💣 " + Style.RESET_ALL)
     print(Fore.MAGENTA + f"[ ip : {ip} | country: {country} ]" + Style.RESET_ALL)
     print(Fore.YELLOW + "=" * 43 + Style.RESET_ALL)
 
@@ -71,13 +73,13 @@ def safe_post(url, headers, json_payload):
             if res.status == 200:
                 return json.loads(response_data)  # Return the JSON response if successful
             else:
-                print(f" Failed with status {res.status}, retrying...")
+                print(f"🎯 Failed with status {res.status}, retrying...")
         except (http.client.HTTPException, TimeoutError, ConnectionError, ssl.SSLEOFError, ssl.SSLError) as e:
-            print(f" Network Error: {e}, retrying...")
+            print(f"🎯 Network Error: {e}, retrying...")
         except socket.gaierror as e:
-            print(f" Address Resolution Error: {e}, retrying...")
+            print(f"🎯 Address Resolution Error: {e}, retrying...")
         time.sleep(3)  # Wait before retrying
-    print(" Failed after several attempts.")
+    print("🎯 Failed after several attempts.")
     return None
 
 def generate_random_nonce(length=52):
@@ -145,7 +147,7 @@ def fetch(account_line):
         else:
             return None
     except (http.client.HTTPException, ssl.SSLEOFError, ssl.SSLError) as e:
-        print(f" SSL Error during fetch: {e}")
+        print(f"🎯 SSL Error during fetch: {e}")
         return None
     finally:
         conn.close()
@@ -169,13 +171,13 @@ def cek_user(index):
         user_data = response['data']['telegramUserMe']
         return user_data  # Return the response result
     else:
-        print(f" Failed with status {response}")
+        print(f"🎯 Failed with status {response}")
         return None  # Return None if an error occurs
 
 def activate_booster(index, headers):
     access_token = fetch(index + 1)
     url = "api-gw-tg.memefi.club"
-    print("\r Activating Turbo Boost ... ", end="", flush=True)
+    print("\r🎯 Activating Turbo Boost ... ", end="", flush=True)
 
     headers = headers_set.copy()  # Make a copy of headers_set to avoid modifying the global variable
     headers['Authorization'] = f'Bearer {access_token}'
@@ -191,7 +193,7 @@ def activate_booster(index, headers):
         current_health = response['data']['telegramGameActivateBooster']['currentBoss']['currentHealth']
         return current_health  # Return current boss health
     else:
-        print(f" Failed to activate booster, retrying...")
+        print(f"🎯 Failed to activate booster, retrying...")
         return None
 
 def submit_taps(index, json_payload):
@@ -205,7 +207,7 @@ def submit_taps(index, json_payload):
     if response:
         return response  # Ensure to return already parsed data
     else:
-        print(f" Failed to tap, retrying...")
+        print(f"🎯 Failed to tap, retrying...")
         return None  # Return None if an error occurs
 
 def set_next_boss(index, headers):
@@ -224,7 +226,7 @@ def set_next_boss(index, headers):
     if response and 'data' in response:
         print("✅ Successfully changed boss.", flush=True)
     else:
-        print(" Failed to change boss.", flush=True)
+        print("🎯 Failed to change boss.", flush=True)
 
 # Check stats
 def cek_stat(index, headers):
@@ -245,7 +247,7 @@ def cek_stat(index, headers):
         user_data = response['data']['telegramGameGetConfig']
         return user_data
     else:
-        print(f" Failed with status {response}")
+        print(f"🎯 Failed with status {response}")
         return None  # Return None if an error occurs
 
 def main():
@@ -297,12 +299,12 @@ def main():
                     league = result.get('league', 'Unknown')
                     accounts.append((index, result, first_name, last_name, league))
                 else:
-                    print(f" Account {index + 1}: Token invalid or error occurred")
+                    print(f"🎯 Account {index + 1}: Token invalid or error occurred")
 
             # Display account list
             print("\rAccount list:                                   ", flush=True)
             for index, _, first_name, last_name, league in accounts:
-                print(f" [ Account {first_name} {last_name} ] | League  {league}")
+                print(f"🎯 [ Account {first_name} {last_name} ] | League 🎯 {league}")
 
             # Process each account
             for index, result, first_name, last_name, league in accounts:
@@ -315,13 +317,13 @@ def main():
                     if stat_result is not None:
                         user_data = stat_result
                         if user_data['freeBoosts']['currentTurboAmount'] <= 0:
-                            print("\n Turbo Boost is not available. Moving to next account.")
+                            print("\n🎯 Turbo Boost is not available. Moving to next account.")
                             break  # Exit the inner while loop to move to the next account
 
                         output = (
                             f"[ Account {index + 1} - {first_name} {last_name} ]\n"
                             f"Coin 🪙  {user_data['coinsAmount']:,}\n"
-                            f"Level 🔫 {user_data['weaponLevel']} 🤖 {user_data['tapBotLevel']}\n"
+                            f"Level 🔧 {user_data['weaponLevel']} 🤖 {user_data['tapBotLevel']}\n"
                             f"Boss 👾 {user_data['currentBoss']['level']} 💘 {user_data['currentBoss']['currentHealth']} - {user_data['currentBoss']['maxHealth']}\n"
                             f"Free 🚀 {user_data['freeBoosts']['currentTurboAmount']}\n"
                         )
@@ -360,11 +362,11 @@ def main():
 
                                 # If taps are repeated and boss health is not changing, restart
                                 if tap_attempts >= 5:  # Adjust the number as needed
-                                    print("\n Boss health is not decreasing. Restarting...")
+                                    print("\n🎯 Boss health is not decreasing. Restarting...")
                                     break  # Break the loop to restart the script
 
                             else:
-                                print(f" Failed to tap, trying again...")
+                                print(f"🎯 Failed to tap, trying again...")
 
                         if current_health <= 0:  # Check if the boss is defeated
                             print("\nBoss defeated, setting next boss...", flush=True)
@@ -374,7 +376,7 @@ def main():
                         break  # Exit the while loop if no valid stats are returned
 
         except Exception as e:
-            print(f" An error occurred: {e}. Restarting from account list...")
+            print(f"🎯 An error occurred: {e}. Restarting from account list...")
 
 # Run the main() function
 main()
